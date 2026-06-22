@@ -1,0 +1,808 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaLedger | Dashboard Financeiro</title>
+  <meta name="description" content="Dashboard financeiro premium com visual SaaS, transaÃ§Ãµes, metas e relatÃ³rios." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: '#07111f',
+            panel: '#0f172a',
+            neon: '#22d3ee',
+            lime: '#84cc16',
+            glow: '#1f2937'
+          },
+          boxShadow: {
+            soft: '0 20px 45px rgba(15, 23, 42, 0.35)',
+            glow: '0 0 0 1px rgba(34,211,238,0.18), 0 18px 40px rgba(34,211,238,0.12)'
+          },
+          backdropBlur: {
+            xs: '2px'
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body
+  class="min-h-screen bg-[radial-gradient(circle_at_top,_#10233b_0%,_#07111f_35%,_#040814_100%)] text-slate-100 antialiased">
+  <div class="app-shell flex min-h-screen overflow-hidden">
+    <aside id="sidebar"
+      class="sidebar glass-panel hidden lg:flex flex-col justify-between p-5 border-r border-white/10 shadow-soft">
+      <div>
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <p class="text-xs uppercase tracking-[0.35em] text-cyan-300">NovaLedger</p>
+            <h2 class="text-xl font-semibold">Finance OS</h2>
+          </div>
+          <button id="collapseSidebar" class="icon-btn" aria-label="Recolher menu">âŸ¨</button>
+        </div>
+        <nav class="space-y-2 text-sm">
+          <a class="nav-link active" href="#">ðŸ“Š Dashboard</a>
+          <a class="nav-link" href="#transactions">ðŸ’³ TransaÃ§Ãµes</a>
+          <a class="nav-link" href="#goals">ðŸŽ¯ Metas</a>
+          <a class="nav-link" href="#reports">ðŸ“ˆ RelatÃ³rios</a>
+          <button id="settingsNav" type="button" class="nav-link w-full text-left">âš™ï¸ ConfiguraÃ§Ãµes</button>
+        </nav>
+      </div>
+      <div class="glass-card p-4 rounded-3xl space-y-3">
+        <div class="flex items-center gap-3">
+          <div id="sidebarAvatar" class="avatar">AL</div>
+          <div>
+            <p id="sidebarUserName" class="text-sm font-semibold">Ana Lima</p>
+            <p id="sidebarUserRole" class="text-xs text-slate-400">Plano Growth</p>
+          </div>
+        </div>
+        <div id="sidebarUsageLabel"
+          class="rounded-2xl border border-emerald-400/20 bg-emerald-400/6 p-3 text-xs text-slate-200">Uso do mÃªs: 82%
+          do limite disponÃ­vel</div>
+        <div id="sidebarTrialBadge"
+          class="hidden rounded-2xl border border-amber-400/20 bg-amber-400/6 p-3 text-xs text-amber-200"></div>
+        <button id="sidebarUpgradeBtn" class="primary-btn w-full text-xs py-2 hidden">🌟 Fazer Upgrade</button>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col">
+      <header id="topBar"
+        class="topbar glass-panel border-b border-white/10 p-4 lg:p-6 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <button id="menuBtn" class="icon-btn lg:hidden" aria-label="Abrir menu">☰</button>
+          <div>
+            <p class="text-xs uppercase tracking-[0.35em] text-emerald-300" data-i18n="panelLabel">Painel Financeiro</p>
+            <h1 class="text-2xl font-semibold tracking-tight" data-i18n="dashboardTitle">Dashboard premium</h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap justify-end">
+          <button id="backBtn" class="secondary-btn hidden lg:inline-flex" aria-label="Voltar">â† Voltar</button>
+          <label class="search-box hidden md:flex">
+            <span>ðŸ”Ž</span>
+            <input id="searchInput" type="search" placeholder="Buscar transaÃ§Ãµes, metas..."
+              class="bg-transparent focus:outline-none text-sm w-56" />
+          </label>
+          <button id="settingsBtn" class="settings-btn" aria-label="Abrir configuraÃ§Ãµes">âš™ï¸</button>
+          <button id="notificationsBtn" class="icon-btn" aria-label="Abrir avisos">ðŸ””</button>
+          <button id="profileBtn" class="icon-btn" aria-label="Abrir perfil">ðŸ‘¤</button>
+        </div>
+      </header>
+
+      <section id="authScreen" class="p-4 lg:p-6 space-y-6 overflow-y-auto">
+        <article class="glass-card rounded-3xl p-6 shadow-soft max-w-4xl mx-auto">
+          <div class="grid lg:grid-cols-[1fr_1.1fr] gap-6 items-center">
+            <div class="space-y-3">
+              <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">NovaLedger</h1>
+              <p class="text-xs uppercase tracking-[0.35em] text-cyan-300" data-i18n="authBadge">Acesso obrigatÃ³rio</p>
+              <h2 class="text-3xl font-semibold" data-i18n="authTitle">Crie sua conta e entre para abrir o painel
+                financeiro</h2>
+              <p class="text-slate-300" data-i18n="authDescription">Antes de ver os grÃ¡ficos, metas e transaÃ§Ãµes, defina
+                sua conta e faÃ§a login para continuar.</p>
+              <ul class="text-sm text-slate-200 space-y-2">
+                <li data-i18n="authPoint1">â€¢ Cadastro rÃ¡pido com nome, e-mail e senha.</li>
+                <li data-i18n="authPoint2">â€¢ Login seguro para acessar o dashboard.</li>
+                <li data-i18n="authPoint3">â€¢ Menu de perfil com sair e dados da conta.</li>
+              </ul>
+            </div>
+            <div class="space-y-4">
+              <form id="loginForm" class="glass-card rounded-3xl p-4 space-y-3">
+                <h3 class="text-xl font-semibold" data-i18n="loginTitle">Entrar</h3>
+                <input id="loginEmail" type="email" required placeholder="E-mail" class="field-input" />
+                <input id="loginPassword" type="password" required placeholder="Senha" class="field-input" />
+                <button type="submit" class="secondary-btn w-full" data-i18n="loginBtn">Entrar</button>
+                <button id="showRegisterBtn" type="button" class="primary-btn w-full" data-i18n="createAccountBtn">Criar
+                  conta</button>
+              </form>
+              <form id="registerForm" class="glass-card rounded-3xl p-4 space-y-3 hidden">
+                <h3 class="text-xl font-semibold" data-i18n="registerTitle">Criar conta</h3>
+                <input id="registerName" type="text" required placeholder="Seu nome" class="field-input" />
+                <input id="registerEmail" type="email" required placeholder="E-mail" class="field-input" />
+                <input id="registerPassword" type="password" required placeholder="Senha" class="field-input" />
+                <button type="submit" class="primary-btn w-full" data-i18n="registerSubmitBtn">Criar conta</button>
+                <button id="backToLoginBtn" type="button" class="secondary-btn w-full" data-i18n="backToLoginBtn">Voltar
+                  para entrar</button>
+              </form>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <div id="dashboardApp" class="hidden">
+        <section class="p-4 lg:p-6 space-y-6 overflow-y-auto">
+          <div class="grid xl:grid-cols-[1.2fr_0.8fr] gap-6">
+            <article class="glass-card p-5 rounded-3xl shadow-soft">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-sm text-slate-300" data-i18n="monthlyFlow">Fluxo mensal</p>
+                  <h2 class="text-3xl font-semibold">R$ 128.450</h2>
+                  <p class="text-sm text-emerald-300 mt-1">+18,4% vs. mÃªs anterior</p>
+                </div>
+                <div class="badge-positive">Em crescimento</div>
+              </div>
+              <div id="dailySummaryHint"
+                class="mt-3 rounded-2xl border border-emerald-400/15 bg-emerald-400/6 p-3 text-xs text-slate-200">Resumo
+                diÃ¡rio: fluxo positivo Â· cobertura 1.0x Â· 2 receitas / 1 despesas.</div>
+              <canvas id="revenueChart" height="120"></canvas>
+            </article>
+
+            <article class="glass-card p-5 rounded-3xl shadow-soft space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-slate-300" data-i18n="quickSummary">Resumo rÃ¡pido</p>
+                  <h3 class="text-xl font-semibold" data-i18n="coverageTitle">Cobertura</h3>
+                </div>
+                <span class="badge-neutral">Hoje</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="mini-card"><strong>+12%</strong><span>Receitas</span></div>
+                <div class="mini-card"><strong>-4%</strong><span>Despesas</span></div>
+                <div class="mini-card"><strong>8.2x</strong><span>ROI</span></div>
+                <div class="mini-card"><strong>94%</strong><span>Meta</span></div>
+              </div>
+              <div class="rounded-2xl border border-cyan-400/15 bg-cyan-400/6 p-4 text-xs text-slate-200">Ajustes
+                automÃ¡ticos de cash flow aplicados nas Ãºltimas 24h.</div>
+            </article>
+          </div>
+
+
+          <section class="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <article class="glass-card stat-card p-5 rounded-3xl shadow-soft">
+              <p class="title">Receita lÃ­quida</p>
+              <p class="value">R$ 84.200</p>
+              <p class="delta">+12,8% em 30 dias</p>
+            </article>
+            <article class="glass-card stat-card p-5 rounded-3xl shadow-soft">
+              <p class="title">Despesas</p>
+              <p class="value">R$ 32.780</p>
+              <p class="delta">-4,2% vs. mÃªs anterior</p>
+            </article>
+            <article class="glass-card stat-card p-5 rounded-3xl shadow-soft">
+              <p class="title">Fluxo de caixa</p>
+              <p class="value">R$ 51.420</p>
+              <p class="delta">Cobertura 1.8x</p>
+            </article>
+            <article class="glass-card stat-card p-5 rounded-3xl shadow-soft">
+              <p class="title">Meta anual</p>
+              <p class="value" id="annualGoalValue">94%</p>
+              <p class="delta" id="annualGoalDelta">Meta anual definida em R$ 150.000</p>
+            </article>
+          </section>
+
+          <section id="transactions" class="grid xl:grid-cols-[1.15fr_0.85fr] gap-6">
+            <article class="glass-card p-5 rounded-3xl shadow-soft">
+              <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+                <div>
+                  <p class="text-sm text-slate-300" data-i18n="transactionsLabel">TransaÃ§Ãµes</p>
+                  <h3 class="text-xl font-semibold" data-i18n="transactionsTitle">Fluxo detalhado</h3>
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                  <button id="addTransactionBtn" class="primary-btn">+ Nova transação</button>
+                   <button id="importCsvBtn" class="secondary-btn">Importar CSV</button>
+                  <button id="exportCsvBtn" class="secondary-btn">Exportar CSV</button>
+                  <button id="printBtn" class="secondary-btn">PDF/Imprimir</button>
+                 </div>
+                 <input id="csvFileInput" type="file" accept=".csv" class="hidden" />
+              </div>
+              <div class="flex gap-2 flex-wrap mb-4">
+                <button data-filter="all" class="chip active">Todos</button>
+                <button data-filter="Receita" class="chip">Receitas</button>
+                <button data-filter="Despesa" class="chip">Despesas</button>
+                <button data-filter="Investimento" class="chip">Investimentos</button>
+              </div>
+              <div class="overflow-x-auto rounded-2xl border border-white/8">
+                <table class="w-full text-sm">
+                  <thead class="text-slate-400 border-b border-white/8 bg-black/10">
+                    <tr>
+                      <th class="px-4 py-3 text-left">DescriÃ§Ã£o</th>
+                      <th class="px-4 py-3 text-left">Categoria</th>
+                      <th class="px-4 py-3 text-left">Data</th>
+                      <th class="px-4 py-3 text-right">Valor</th>
+                      <th class="px-4 py-3 text-right">AÃ§Ãµes</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transactionsTableBody"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="space-y-6">
+              <div id="goals" class="glass-card p-5 rounded-3xl shadow-soft">
+                <p class="text-sm text-slate-300">Metas financeiras</p>
+                <h3 class="text-xl font-semibold">Progresso atual</h3>
+                <div class="space-y-4 mt-4">
+                  <div class="goal-card">
+                    <div class="goal-label"><span>Reserva de emergÃªncia</span><strong>82%</strong></div>
+                    <div class="progress"><span style="width:82%"></span></div>
+                  </div>
+                  <div class="goal-card">
+                    <div class="goal-label"><span>Investimentos</span><strong>64%</strong></div>
+                    <div class="progress"><span style="width:64%"></span></div>
+                  </div>
+                  <div class="goal-card">
+                    <div class="goal-label"><span>ExpansÃ£o</span><strong>48%</strong></div>
+                    <div class="progress"><span style="width:48%"></span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="reports" class="glass-card p-5 rounded-3xl shadow-soft">
+                <p class="text-sm text-slate-300" data-i18n="reportsLabel">Indicadores</p>
+                <h3 class="text-xl font-semibold" data-i18n="reportsTitle">Performance</h3>
+                <canvas id="donutChart" height="180"></canvas>
+              </div>
+            </article>
+          </section>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop hidden"></div>
+
+  <aside id="notificationsPanel" class="settings-panel glass-card hidden" aria-hidden="true">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <p class="text-sm text-slate-300">Avisos</p>
+        <h3 class="text-xl font-semibold">Centro de alertas</h3>
+      </div>
+      <button id="closeNotificationsBtn" class="icon-btn" aria-label="Fechar avisos">âœ•</button>
+    </div>
+    <div id="notificationsList" class="space-y-3 text-sm text-slate-200">
+      <article class="rounded-2xl border border-cyan-400/15 bg-cyan-400/6 p-3">Fluxo de caixa estÃ¡ 18% acima da meta
+        mensal.</article>
+      <article class="rounded-2xl border border-emerald-400/15 bg-emerald-400/6 p-3">Receitas programadas para amanhÃ£
+        foram atualizadas.</article>
+      <article class="rounded-2xl border border-rose-400/15 bg-rose-400/6 p-3">Revise as despesas de assinatura com
+        maior impacto.</article>
+    </div>
+  </aside>
+
+  <aside id="profileMenu" class="settings-panel glass-card hidden" aria-hidden="true">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <p class="text-sm text-slate-300">Perfil</p>
+        <h3 id="profileNameLabel" class="text-xl font-semibold">UsuÃ¡rio</h3>
+      </div>
+      <button id="closeProfileBtn" class="icon-btn" aria-label="Fechar perfil">âœ•</button>
+    </div>
+    <div class="space-y-3 text-sm text-slate-200">
+      <div class="rounded-2xl border border-white/10 bg-black/10 p-3">E-mail: <strong id="profileEmailLabel">â€”</strong>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-black/10 p-3">Plano: <strong
+          id="profilePlanLabel">Growth</strong></div>
+      <button id="profileUpgradeBtn" type="button" class="primary-btn w-full hidden">ðŸŒŸ Fazer Upgrade</button>
+      <div class="rounded-2xl border border-white/10 bg-black/10 p-3">Status: <strong id="profileStatusLabel">Conta
+          ativa</strong></div>
+      <div class="rounded-2xl border border-white/10 bg-black/10 p-3">Ãšltimo acesso: <strong
+          id="profileLastLabel">Hoje</strong></div>
+      <button id="logoutBtn" type="button" class="secondary-btn w-full">Sair da conta</button>
+    </div>
+  </aside>
+
+  <aside id="settingsPanel" class="settings-panel glass-card hidden" aria-hidden="true">
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div>
+        <p class="text-sm text-slate-300" data-i18n="settingsLabel">ConfiguraÃ§Ãµes</p>
+        <h3 class="text-xl font-semibold" data-i18n="settingsTitle">Painel financeiro</h3>
+      </div>
+      <button id="closeSettingsBtn" class="icon-btn" aria-label="Fechar configuraÃ§Ãµes">âœ•</button>
+    </div>
+    <div class="space-y-4 text-sm text-slate-200">
+      <label class="field-label">
+        <span data-i18n="currencyLabel">Moeda</span>
+        <select id="currencySelect">
+          <option>BRL</option>
+          <option>USD</option>
+          <option>EUR</option>
+        </select>
+      </label>
+      <label class="field-label">
+        <span data-i18n="timezoneLabel">Fuso horÃ¡rio</span>
+        <select id="timezoneSelect">
+          <option>BrasÃ­lia</option>
+          <option>New York</option>
+          <option>Lisboa</option>
+        </select>
+      </label>
+      <label class="field-label">
+        <span data-i18n="dateFormatLabel">Formato de data</span>
+        <select id="dateFormatSelect">
+          <option>DD/MM/AAAA</option>
+          <option>MM/DD/AAAA</option>
+          <option>AAAA-MM-DD</option>
+        </select>
+      </label>
+      <label class="field-label">
+        <span>Meta anual (R$)</span>
+        <input id="annualGoalInput" type="number" min="1000" step="1000" value="150000" />
+      </label>
+      <label class="field-label">
+        <span data-i18n="languageLabel">Idioma</span>
+        <select id="languageSelect">
+          <option value="pt">PortuguÃªs</option>
+          <option value="en">English</option>
+        </select>
+      </label>
+      <label class="field-label checkbox-card">
+        <input id="backupToggle" type="checkbox" checked /> <span data-i18n="backupLabel">Backup automÃ¡tico</span>
+      </label>
+      <label class="field-label checkbox-card">
+        <input id="emailReminderToggle" type="checkbox" checked /> <span data-i18n="emailReminderLabel">Lembretes por
+          e-mail</span>
+      </label>
+      <label class="field-label checkbox-card">
+        <input id="showGoalsToggle" type="checkbox" checked /> <span data-i18n="showGoalsLabel">Exibir metas
+          financeiras</span>
+      </label>
+      <label class="field-label checkbox-card">
+        <input id="autoRefreshToggle" type="checkbox" checked /> <span data-i18n="autoRefreshLabel">AtualizaÃ§Ã£o
+          automÃ¡tica do painel</span>
+      </label>
+      <label class="field-label checkbox-card">
+        <input id="alertsToggle" type="checkbox" checked /> <span data-i18n="alertsLabel">Alertas de fluxo de
+          caixa</span>
+      </label>
+      <label class="field-label checkbox-card">
+        <input id="csvToggle" type="checkbox" checked /> <span data-i18n="csvLabel">ExportaÃ§Ã£o automÃ¡tica em CSV</span>
+      </label>
+      <label class="field-label checkbox-card">
+        <input id="dailySummaryToggle" type="checkbox" checked /> <span data-i18n="dailySummaryLabel">Resumo diÃ¡rio do
+          fluxo</span>
+      </label>
+      <div id="settingsSummary" class="rounded-2xl border border-cyan-400/15 bg-cyan-400/6 p-3 text-xs text-slate-200">
+        Exemplo: configure moeda, fuso, alertas, exportaÃ§Ã£o CSV e resumo diÃ¡rio para personalizar o dashboard
+        financeiro.
+      </div>
+      <div id="simDevCard" class="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-3 text-xs text-rose-200 mt-2">
+        <p class="font-bold mb-1">ðŸ› ï¸ Ferramenta de Teste (Dev)</p>
+        <button id="simTrialExpireBtn" type="button"
+          class="secondary-btn text-xs py-1.5 px-2 w-full mt-1 border-rose-500/40 hover:bg-rose-500/10">Simular
+          ExpiraÃ§Ã£o de Teste (3 dias)</button>
+      </div>
+      <button id="applySettingsBtn" type="button" class="primary-btn w-full" data-i18n="applySettingsBtn">Aplicar
+        configuraÃ§Ãµes</button>
+    </div>
+  </aside>
+
+  <section id="transactionModal" class="modal hidden" aria-hidden="true">
+    <div class="glass-card rounded-3xl p-5 w-full max-w-xl shadow-soft">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <p class="text-sm text-slate-300">Gerenciar transaÃ§Ã£o</p>
+          <h3 id="modalTitle" class="text-xl font-semibold">Nova transaÃ§Ã£o</h3>
+        </div>
+        <button id="closeModalBtn" class="icon-btn" aria-label="Fechar modal">âœ•</button>
+      </div>
+      <form id="transactionForm" class="space-y-4">
+        <input id="txId" type="hidden" />
+        <div class="grid md:grid-cols-2 gap-4">
+          <label class="field-label">DescriÃ§Ã£o<input id="txDescription" type="text" required /></label>
+          <label class="field-label">Categoria<select id="txCategory">
+              <option>Receita</option>
+              <option>Despesa</option>
+              <option>Investimento</option>
+            </select></label>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4">
+          <label class="field-label">Valor<input id="txAmount" type="number" step="0.01" required /></label>
+          <label class="field-label">Data<input id="txDate" type="date" required /></label>
+        </div>
+        <label class="field-label">ObservaÃ§Ãµes<textarea id="txNotes" rows="3"
+            placeholder="Detalhes da operaÃ§Ã£o"></textarea></label>
+        <div class="flex justify-end gap-2">
+          <button type="button" id="cancelModalBtn" class="secondary-btn">Cancelar</button>
+          <button type="submit" class="primary-btn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- OVERLAY: TESTE EXPIRADO -->
+  <div id="trialExpiredOverlay"
+    class="fixed inset-0 bg-ink/90 backdrop-blur-md flex items-center justify-center z-[100] hidden p-4 overflow-y-auto">
+    <div
+      class="glass-card rounded-3xl p-6 md:p-8 w-full max-w-4xl shadow-glow border border-cyan-400/30 text-slate-100 flex flex-col gap-6">
+      <div class="text-center space-y-2">
+        <span
+          class="px-3 py-1 bg-rose-500/10 border border-rose-500/30 text-rose-300 rounded-full text-xs font-semibold tracking-wider uppercase">PerÃ­odo
+          de Teste Expirado</span>
+        <h2 class="text-3xl font-extrabold text-white">Seu perÃ­odo de teste de 3 dias terminou!</h2>
+        <p class="text-slate-300 text-sm max-w-lg mx-auto">Para continuar a utilizar o painel financeiro, gerenciar suas
+          transaÃ§Ãµes e metas, escolha um de nossos planos premium abaixo.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start mt-2">
+        <!-- Coluna 1: Planos -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-semibold uppercase tracking-wider text-cyan-300">1. Selecione o Plano</h4>
+
+          <div
+            class="plan-card active cursor-pointer border-2 border-cyan-400 bg-panel/80 p-4 rounded-2xl flex flex-col gap-2 hover:border-cyan-400 transition"
+            data-plan="Premium" data-price="29.90">
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-bold text-white">Plano Premium</span>
+              <span class="text-xl font-extrabold text-cyan-300">R$ 29,90<span
+                  class="text-xs font-normal text-slate-400">/mÃªs</span></span>
+            </div>
+            <p class="text-xs text-slate-400">Perfeito para controle de finanÃ§as pessoais avanÃ§adas.</p>
+            <ul class="text-xs text-slate-200 space-y-1 mt-1">
+              <li>â€¢ TransaÃ§Ãµes ilimitadas</li>
+              <li>â€¢ ExportaÃ§Ã£o automÃ¡tica para CSV</li>
+              <li>â€¢ RelatÃ³rios detalhados e grÃ¡ficos em tempo real</li>
+            </ul>
+          </div>
+
+          <div
+            class="plan-card cursor-pointer border border-white/10 bg-panel/40 p-4 rounded-2xl flex flex-col gap-2 hover:border-cyan-400/40 transition"
+            data-plan="Enterprise" data-price="59.90">
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-bold text-white">Plano Enterprise</span>
+              <span class="text-xl font-extrabold text-lime-400">R$ 59,90<span
+                  class="text-xs font-normal text-slate-400">/mÃªs</span></span>
+            </div>
+            <p class="text-xs text-slate-400">Desenvolvido para empresas, freelancers e gestÃ£o complexa.</p>
+            <ul class="text-xs text-slate-200 space-y-1 mt-1">
+              <li>â€¢ Tudo do plano Premium</li>
+              <li>â€¢ Backup automÃ¡tico na nuvem</li>
+              <li>â€¢ Suporte prioritÃ¡rio 24/7</li>
+              <li>â€¢ Multi-moedas e relatÃ³rios consolidados</li>
+            </ul>
+          </div>
+
+          <button id="expiredLogoutBtn" class="secondary-btn w-full text-xs py-2 mt-4">Sair da minha conta</button>
+        </div>
+
+        <!-- Coluna 2: MÃ©todos de Pagamento -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-semibold uppercase tracking-wider text-cyan-300">2. Forma de Pagamento</h4>
+          <div class="flex border border-white/10 rounded-xl overflow-hidden text-xs font-semibold bg-black/20">
+            <button class="pay-tab active flex-1 py-2 text-center bg-cyan-400/10 text-cyan-300 border-r border-white/10"
+              data-method="pix">Pix</button>
+            <button class="pay-tab flex-1 py-2 text-center hover:bg-white/5 border-r border-white/10"
+              data-method="credit">CrÃ©dito</button>
+            <button class="pay-tab flex-1 py-2 text-center hover:bg-white/5" data-method="debit">DÃ©bito</button>
+          </div>
+
+          <!-- FormulÃ¡rios de Pagamento -->
+          <div id="paymentFormsContainer" class="glass-card p-4 rounded-2xl border border-white/10 bg-black/10">
+
+            <!-- PIX -->
+            <div id="pixPaymentForm" class="space-y-4">
+              <div class="flex flex-col items-center justify-center p-3 bg-white/5 rounded-2xl">
+                <svg width="120" height="120" viewBox="0 0 100 100" class="text-white fill-current">
+                  <rect width="100" height="100" fill="none" rx="8" />
+                  <rect x="5" y="5" width="25" height="25" fill="none" stroke="currentColor" stroke-width="5" />
+                  <rect x="12" y="12" width="11" height="11" />
+                  <rect x="70" y="5" width="25" height="25" fill="none" stroke="currentColor" stroke-width="5" />
+                  <rect x="77" y="12" width="11" height="11" />
+                  <rect x="5" y="70" width="25" height="25" fill="none" stroke="currentColor" stroke-width="5" />
+                  <rect x="12" y="77" width="11" height="11" />
+                  <rect x="40" y="10" width="10" height="5" />
+                  <rect x="45" y="20" width="5" height="15" />
+                  <rect x="10" y="40" width="15" height="5" />
+                  <rect x="25" y="45" width="10" height="10" />
+                  <rect x="40" y="40" width="20" height="20" />
+                  <rect x="70" y="40" width="15" height="10" />
+                  <rect x="80" y="55" width="10" height="15" />
+                  <rect x="40" y="75" width="15" height="15" />
+                  <rect x="65" y="75" width="10" height="5" />
+                  <rect x="75" y="80" width="15" height="10" />
+                </svg>
+                <p class="text-[10px] text-slate-400 mt-2">Escaneie o QR Code fictÃ­cio acima</p>
+              </div>
+
+              <div class="space-y-1">
+                <span class="text-xs text-slate-400">Pix Copia e Cola:</span>
+                <div class="flex gap-2">
+                  <input type="text" readonly value="novaledger-pix-pagamento-123456789-sec"
+                    class="field-input text-xs flex-1 py-1 px-2 border-white/10 bg-black/30 select-all"
+                    id="expiredPixKey" />
+                  <button type="button" class="secondary-btn text-xs py-1 px-3" id="btnCopyPixExpired">Copiar</button>
+                </div>
+              </div>
+
+              <button type="button"
+                class="primary-btn w-full text-sm py-2 bg-gradient-to-r from-cyan-400 to-lime-400 font-bold border-none shadow-glow flex items-center justify-center gap-2 expired-pay-submit-btn">
+                <span>Confirmar Pagamento Pix</span>
+              </button>
+            </div>
+
+            <!-- CartÃ£o de CrÃ©dito -->
+            <div id="creditPaymentForm" class="space-y-3 hidden">
+              <form class="space-y-2 expired-card-form">
+                <label class="field-label text-xs">NÃºmero do CartÃ£o
+                  <input type="text" class="field-input text-xs py-2" placeholder="4532 1198 2384 9012" maxlength="19"
+                    required />
+                </label>
+                <label class="field-label text-xs">Nome no CartÃ£o
+                  <input type="text" class="field-input text-xs py-2" placeholder="ANA L LIMA" required />
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="field-label text-xs">Validade
+                    <input type="text" class="field-input text-xs py-2" placeholder="12/30" maxlength="5" required />
+                  </label>
+                  <label class="field-label text-xs">CVV
+                    <input type="password" class="field-input text-xs py-2" placeholder="123" maxlength="4" required />
+                  </label>
+                </div>
+                <button type="submit"
+                  class="primary-btn w-full text-sm py-2 bg-gradient-to-r from-cyan-400 to-lime-400 font-bold border-none shadow-glow flex items-center justify-center gap-2">
+                  <span>Confirmar Pagamento CrÃ©dito</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- CartÃ£o de DÃ©bito -->
+            <div id="debitPaymentForm" class="space-y-3 hidden">
+              <form class="space-y-2 expired-card-form">
+                <label class="field-label text-xs">NÃºmero do CartÃ£o
+                  <input type="text" class="field-input text-xs py-2" placeholder="5432 9901 8872 1109" maxlength="19"
+                    required />
+                </label>
+                <label class="field-label text-xs">Nome no CartÃ£o
+                  <input type="text" class="field-input text-xs py-2" placeholder="ANA L LIMA" required />
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="field-label text-xs">Validade
+                    <input type="text" class="field-input text-xs py-2" placeholder="06/29" maxlength="5" required />
+                  </label>
+                  <label class="field-label text-xs">CVV
+                    <input type="password" class="field-input text-xs py-2" placeholder="987" maxlength="4" required />
+                  </label>
+                </div>
+                <button type="submit"
+                  class="primary-btn w-full text-sm py-2 bg-gradient-to-r from-cyan-400 to-lime-400 font-bold border-none shadow-glow flex items-center justify-center gap-2">
+                  <span>Confirmar Pagamento DÃ©bito</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Loader de Processamento -->
+            <div id="paymentLoadingState" class="hidden flex flex-col items-center justify-center py-8 space-y-4">
+              <div class="w-12 h-12 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin"></div>
+              <div class="text-center">
+                <p class="text-sm font-semibold text-white">Processando pagamento...</p>
+                <p class="text-xs text-slate-400 mt-1">Isso levarÃ¡ apenas alguns segundos.</p>
+              </div>
+            </div>
+
+            <!-- Sucesso do Pagamento -->
+            <div id="paymentSuccessState"
+              class="hidden flex flex-col items-center justify-center py-6 space-y-3 text-center">
+              <div
+                class="w-12 h-12 bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 rounded-full flex items-center justify-center text-xl font-bold">
+                âœ“</div>
+              <div>
+                <p class="text-base font-bold text-white">Pagamento Aprovado!</p>
+                <p class="text-xs text-slate-300 mt-1">Sua conta foi atualizada para o plano <strong
+                    id="successPlanName" class="text-cyan-300">Premium</strong>.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: UPGRADE DE DENTRO DO PAINEL -->
+  <div id="upgradeModal"
+    class="fixed inset-0 bg-ink/75 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4 overflow-y-auto">
+    <div
+      class="glass-card rounded-3xl p-6 md:p-8 w-full max-w-4xl shadow-glow border border-cyan-400/20 text-slate-100 flex flex-col gap-6 relative">
+      <button id="closeUpgradeModalBtn" class="absolute top-4 right-4 icon-btn" aria-label="Fechar upgrade">âœ•</button>
+
+      <div class="text-center space-y-1">
+        <h2 class="text-2xl font-extrabold text-white">ðŸš€ FaÃ§a um Upgrade no seu NovaLedger</h2>
+        <p class="text-slate-300 text-sm max-w-md mx-auto">Adquira recursos exclusivos e gerencie suas finanÃ§as sem
+          limites e com backup automatizado.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start mt-2">
+        <!-- Coluna 1: Planos -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-semibold uppercase tracking-wider text-cyan-300">1. Escolha o Novo Plano</h4>
+
+          <div
+            class="plan-card active cursor-pointer border-2 border-cyan-400 bg-panel/80 p-4 rounded-2xl flex flex-col gap-2 hover:border-cyan-400 transition"
+            data-plan="Premium" data-price="29.90">
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-bold text-white">Plano Premium</span>
+              <span class="text-xl font-extrabold text-cyan-300">R$ 29,90<span
+                  class="text-xs font-normal text-slate-400">/mÃªs</span></span>
+            </div>
+            <p class="text-xs text-slate-400">Perfeito para controle de finanÃ§as pessoais avanÃ§adas.</p>
+            <ul class="text-xs text-slate-200 space-y-1 mt-1">
+              <li>â€¢ TransaÃ§Ãµes ilimitadas</li>
+              <li>â€¢ ExportaÃ§Ã£o automÃ¡tica para CSV</li>
+              <li>â€¢ RelatÃ³rios detalhados e grÃ¡ficos em tempo real</li>
+            </ul>
+          </div>
+
+          <div
+            class="plan-card cursor-pointer border border-white/10 bg-panel/40 p-4 rounded-2xl flex flex-col gap-2 hover:border-cyan-400/40 transition"
+            data-plan="Enterprise" data-price="59.90">
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-bold text-white">Plano Enterprise</span>
+              <span class="text-xl font-extrabold text-lime-400">R$ 59,90<span
+                  class="text-xs font-normal text-slate-400">/mÃªs</span></span>
+            </div>
+            <p class="text-xs text-slate-400">Desenvolvido para empresas, freelancers e gestÃ£o complexa.</p>
+            <ul class="text-xs text-slate-200 space-y-1 mt-1">
+              <li>â€¢ Tudo do plano Premium</li>
+              <li>â€¢ Backup automÃ¡tico na nuvem</li>
+              <li>â€¢ Suporte prioritÃ¡rio 24/7</li>
+              <li>â€¢ Multi-moedas e relatÃ³rios consolidados</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Coluna 2: MÃ©todos de Pagamento -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-semibold uppercase tracking-wider text-cyan-300">2. Forma de Pagamento</h4>
+          <div class="flex border border-white/10 rounded-xl overflow-hidden text-xs font-semibold bg-black/20">
+            <button
+              class="modal-pay-tab active flex-1 py-2 text-center bg-cyan-400/10 text-cyan-300 border-r border-white/10"
+              data-method="pix">Pix</button>
+            <button class="modal-pay-tab flex-1 py-2 text-center hover:bg-white/5 border-r border-white/10"
+              data-method="credit">CrÃ©dito</button>
+            <button class="modal-pay-tab flex-1 py-2 text-center hover:bg-white/5" data-method="debit">DÃ©bito</button>
+          </div>
+
+          <!-- FormulÃ¡rios de Pagamento -->
+          <div id="modalPaymentFormsContainer" class="glass-card p-4 rounded-2xl border border-white/10 bg-black/10">
+
+            <!-- PIX -->
+            <div id="modalPixPaymentForm" class="space-y-4">
+              <div class="flex flex-col items-center justify-center p-3 bg-white/5 rounded-2xl">
+                <svg width="120" height="120" viewBox="0 0 100 100" class="text-white fill-current">
+                  <rect width="100" height="100" fill="none" rx="8" />
+                  <rect x="5" y="5" width="25" height="25" fill="none" stroke="currentColor" stroke-width="5" />
+                  <rect x="12" y="12" width="11" height="11" />
+                  <rect x="70" y="5" width="25" height="25" fill="none" stroke="currentColor" stroke-width="5" />
+                  <rect x="77" y="12" width="11" height="11" />
+                  <rect x="5" y="70" width="25" height="25" fill="none" stroke="currentColor" stroke-width="5" />
+                  <rect x="12" y="77" width="11" height="11" />
+                  <rect x="40" y="10" width="10" height="5" />
+                  <rect x="45" y="20" width="5" height="15" />
+                  <rect x="10" y="40" width="15" height="5" />
+                  <rect x="25" y="45" width="10" height="10" />
+                  <rect x="40" y="40" width="20" height="20" />
+                  <rect x="70" y="40" width="15" height="10" />
+                  <rect x="80" y="55" width="10" height="15" />
+                  <rect x="40" y="75" width="15" height="15" />
+                  <rect x="65" y="75" width="10" height="5" />
+                  <rect x="75" y="80" width="15" height="10" />
+                </svg>
+                <p class="text-[10px] text-slate-400 mt-2">Escaneie o QR Code fictÃ­cio acima</p>
+              </div>
+
+              <div class="space-y-1">
+                <span class="text-xs text-slate-400">Pix Copia e Cola:</span>
+                <div class="flex gap-2">
+                  <input type="text" readonly value="novaledger-pix-pagamento-123456789-sec"
+                    class="field-input text-xs flex-1 py-1 px-2 border-white/10 bg-black/30 select-all"
+                    id="modalPixKey" />
+                  <button type="button" class="secondary-btn text-xs py-1 px-3" id="btnCopyPixModal">Copiar</button>
+                </div>
+              </div>
+
+              <button type="button"
+                class="primary-btn w-full text-sm py-2 bg-gradient-to-r from-cyan-400 to-lime-400 font-bold border-none shadow-glow flex items-center justify-center gap-2 upgrade-pay-submit-btn">
+                <span>Confirmar Pagamento Pix</span>
+              </button>
+            </div>
+
+            <!-- CartÃ£o de CrÃ©dito -->
+            <div id="modalCreditPaymentForm" class="space-y-3 hidden">
+              <form class="space-y-2 upgrade-card-form">
+                <label class="field-label text-xs">NÃºmero do CartÃ£o
+                  <input type="text" class="field-input text-xs py-2" placeholder="4532 1198 2384 9012" maxlength="19"
+                    required />
+                </label>
+                <label class="field-label text-xs">Nome no CartÃ£o
+                  <input type="text" class="field-input text-xs py-2" placeholder="ANA L LIMA" required />
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="field-label text-xs">Validade
+                    <input type="text" class="field-input text-xs py-2" placeholder="12/30" maxlength="5" required />
+                  </label>
+                  <label class="field-label text-xs">CVV
+                    <input type="password" class="field-input text-xs py-2" placeholder="123" maxlength="4" required />
+                  </label>
+                </div>
+                <button type="submit"
+                  class="primary-btn w-full text-sm py-2 bg-gradient-to-r from-cyan-400 to-lime-400 font-bold border-none shadow-glow flex items-center justify-center gap-2">
+                  <span>Confirmar Pagamento CrÃ©dito</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- CartÃ£o de DÃ©bito -->
+            <div id="modalDebitPaymentForm" class="space-y-3 hidden">
+              <form class="space-y-2 upgrade-card-form">
+                <label class="field-label text-xs">NÃºmero do CartÃ£o
+                  <input type="text" class="field-input text-xs py-2" placeholder="5432 9901 8872 1109" maxlength="19"
+                    required />
+                </label>
+                <label class="field-label text-xs">Nome no CartÃ£o
+                  <input type="text" class="field-input text-xs py-2" placeholder="ANA L LIMA" required />
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="field-label text-xs">Validade
+                    <input type="text" class="field-input text-xs py-2" placeholder="06/29" maxlength="5" required />
+                  </label>
+                  <label class="field-label text-xs">CVV
+                    <input type="password" class="field-input text-xs py-2" placeholder="987" maxlength="4" required />
+                  </label>
+                </div>
+                <button type="submit"
+                  class="primary-btn w-full text-sm py-2 bg-gradient-to-r from-cyan-400 to-lime-400 font-bold border-none shadow-glow flex items-center justify-center gap-2">
+                  <span>Confirmar Pagamento DÃ©bito</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Loader de Processamento -->
+            <div id="modalPaymentLoadingState" class="hidden flex flex-col items-center justify-center py-8 space-y-4">
+              <div class="w-12 h-12 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin"></div>
+              <div class="text-center">
+                <p class="text-sm font-semibold text-white">Processando pagamento...</p>
+                <p class="text-xs text-slate-400 mt-1">Isso levarÃ¡ apenas alguns segundos.</p>
+              </div>
+            </div>
+
+            <!-- Sucesso do Pagamento -->
+            <div id="modalPaymentSuccessState"
+              class="hidden flex flex-col items-center justify-center py-6 space-y-3 text-center">
+              <div
+                class="w-12 h-12 bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 rounded-full flex items-center justify-center text-xl font-bold">
+                âœ“</div>
+              <div>
+                <p class="text-base font-bold text-white">Pagamento Aprovado!</p>
+                <p class="text-xs text-slate-300 mt-1">Sua conta foi atualizada para o plano <strong
+                    id="modalSuccessPlanName" class="text-cyan-300">Premium</strong>.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
+
