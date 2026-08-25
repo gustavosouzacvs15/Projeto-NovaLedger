@@ -1,4 +1,4 @@
-# 🏁 Projeto NovaLedger — Plataforma Inteligente de Gestão Financeira
+# 🏁 Projeto NovaLedger — Plataforma Inteligente de Gestão Financeira (FEITO PARA TRABALHO DE UNIVERSIDADE)
 
 **Filosofia:** Transformar o controle financeiro pessoal e empresarial em uma experiência simples, visual e inteligente, permitindo que usuários acompanhem receitas, despesas, investimentos e metas financeiras em tempo real.
 
